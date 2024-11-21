@@ -1,24 +1,32 @@
 from rest_framework.fields import SerializerMethodField
-from rest_framework.serializers import ModelSerializer
+from courses.models import Course, Lesson, Subscription
+from courses.validators import validate_youtube_link
+from rest_framework import serializers
 
-from courses.models import Course, Lesson
 
+class LessonSerializer(serializers.ModelSerializer):
+    # Для уроков добавил валидатор только на ютуб
+    video_url = serializers.CharField(validators=[validate_youtube_link])
 
-class LessonSerializer(ModelSerializer):
     class Meta:
         model = Lesson
         fields = "__all__"
 
 
-class CourseSerializer(ModelSerializer):
+class CourseSerializer(serializers.ModelSerializer):
     lessons = LessonSerializer(many=True, read_only=True)
+    subscription = serializers.SerializerMethodField()
+
+    def get_subscription(self, obj):
+        user = self.context["request"].user
+        return Subscription.objects.filter(user=user, course=obj).exists()
 
     class Meta:
         model = Course
-        fields = "__all__"
+        fields = ("id", "name", "lessons", "subscription")
 
 
-class CourseDetailSerializer(ModelSerializer):
+class CourseDetailSerializer(serializers.ModelSerializer):
     lesson_count = SerializerMethodField()
     lessons = LessonSerializer(many=True, read_only=True)
 
