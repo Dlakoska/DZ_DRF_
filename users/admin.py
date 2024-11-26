@@ -11,3 +11,4 @@ class UserAdmin(admin.ModelAdmin):
 @admin.register(Payment)
 class UserAdmin(admin.ModelAdmin):
     list_display = ['user', ]
+
