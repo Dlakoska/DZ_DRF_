@@ -14,7 +14,6 @@ def convert_currency(amount):
 
 def create_stripe_product(prod):
     """ Создание продукта в страйпе """
-    product = prod.paid_course if prod.paid_course else prod.separately_paid_lesson
     stripe_product = stripe.Product.create(name=prod)
     return stripe_product
 

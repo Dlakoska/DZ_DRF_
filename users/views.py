@@ -19,11 +19,13 @@ class PaymentViewSet(ModelViewSet):
 
     def perform_create(self, serializer):
         payment = serializer.save(user=self.request.user)
+        course = Course.objects.get(id=self.request.data['course_id'])
         product_id = create_stripe_product(payment)
         price = create_stripe_price(payment.payment_amount, product_id)
         session_id, link_payment = create_stripe_session(price)
         payment.session_id = session_id
         payment.payment_link = link_payment
+        payment.paid_course = course
         payment.save()
 
 
