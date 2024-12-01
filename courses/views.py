@@ -44,13 +44,7 @@ class CourseViewSet(ModelViewSet):
 
     def perform_update(self, serializer):
         course = serializer.save()
-
-        emails = []
-        subscriptions = Subscription.objects.filter(course=course)
-        for s in subscriptions:
-            emails.append(s.user.email)
-
-        send_info.delay(course.id, emails, f'Изменен курс {course.name}')
+        send_info.delay(course_id=course.id)
 
 
 class LessonCreateAPIView(CreateAPIView):
